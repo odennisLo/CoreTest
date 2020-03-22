@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NLog;
 
 namespace Core
 {
@@ -19,6 +21,10 @@ namespace Core
         }
 
         public IConfiguration Configuration { get; }
+
+        public void ConfigureContainer(ContainerBuilder builder) {
+            builder.RegisterAssemblyTypes().AsImplementedInterfaces();
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -45,7 +51,7 @@ namespace Core
             app.UseRouting();
 
             app.UseAuthorization();
-
+            LogManager.Configuration.Variables["connectionString"] = Configuration.GetConnectionString("DefaultConnection");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
