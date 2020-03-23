@@ -1,8 +1,127 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@section scripts {    
+    <link href="~/packages/core/main.css" rel="stylesheet" />
+    <link href="~/packages/daygrid/main.css" rel="stylesheet" />
+    <link href="~/packages/timegrid/main.css" rel="stylesheet" />
+    <link href="~/packages/list/main.css" rel="stylesheet" />
+    <script src="~/packages/core/main.js"></script>
+    <script src="~/packages/interaction/main.js"></script>
+    <script src="~/packages/daygrid/main.js"></script>
+    <script src="~/packages/timegrid/main.js"></script>
+    <script src="~/packages/list/main.js"></script>
+    <script>
 
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: ['interaction', 'dayGrid', 'timeGrid', 'list'],
+                //defaultView: 'month',
+                editable: true,
+                //selectable: true,
+                //header: { // 頂部排版
+                //    left: "prev,next prevYear,nextYear today", // 左邊放置上一頁、下一頁和今天
+                //    center: "title", // 中間放置標題
+                //    right: "month,basicWeek,basicDay" // 右邊放置月、周、天
+                //},
+                //dayNamesShort: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+                //dayNamesMin: ["日", "一", "二", "三", "四", "五", "六"],
+                //monthNames: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+                //buttonText: {
+                //    today: '今天',
+                //    month: '月',
+                //    week: '週',
+                //    day: '日',
+                //    prev: "上個月",
+                //    next: '下個月',
+                //    prevYear: '去年',
+                //    nextYear: '明年',
+                //},
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                },
+                defaultDate: Date.now,
+                navLinks: true, // can click day/week names to navigate views
+                businessHours: true, // display business hours
+                //editable: true,
+                events: [
+                    {
+                        title: 'Business Lunch',
+                        start: '2020-02-03T13:00:00',
+                        constraint: 'businessHours'
+                    },
+                    {
+                        title: 'Meeting',
+                        start: '2020-02-13T11:00:00',
+                        constraint: 'availableForMeeting', // defined below
+                        color: '#257e4a'
+                    },
+                    {
+                        title: 'Conference',
+                        start: '2020-02-18',
+                        end: '2020-02-20'
+                    },
+                    {
+                        title: 'Party',
+                        start: '2020-02-29T20:00:00'
+                    },
+
+                    // areas where "Meeting" must be dropped
+                    {
+                        groupId: 'availableForMeeting',
+                        start: '2020-02-11T10:00:00',
+                        end: '2020-02-11T16:00:00',
+                        rendering: 'background'
+                    },
+                    {
+                        groupId: 'availableForMeeting',
+                        start: '2020-02-13T10:00:00',
+                        end: '2020-02-13T16:00:00',
+                        rendering: 'background'
+                    },
+
+                    // red areas where no events can be dropped
+                    {
+                        start: '2020-02-24',
+                        end: '2020-02-28',
+                        overlap: false,
+                        rendering: 'background',
+                        color: '#ff9f89'
+                    },
+                    {
+                        start: '2020-02-06',
+                        end: '2020-02-08',
+                        overlap: false,
+                        rendering: 'background',
+                        color: '#ff9f89'
+                    }
+                ]
+            });
+
+            calendar.render();
+        });
+
+    </script>
+    <style>
+
+        body {
+            margin: 40px 10px;
+            padding: 0;
+            font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+
+        #calendar {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+    </style>
+}
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <input type="button" value="新增" class="btn btn-success"/>
+    <div id='calendar'></div>
 </div>

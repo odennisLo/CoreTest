@@ -3,19 +3,24 @@ using Core.Models;
 using Dapper;
 using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace Core.DAL
 {
     public class DataDal: ConnectionFactory
     {
-        private readonly IDbConnection _context;
-        private ApiData<CalendarModel> dataList;
-        public DataDal()
-        {
-            var dbContext = new ConnectionFactory();
-            _context = dbContext.CreateConnection();
+        private readonly IDbConnection _context;        
+        public DataDal(ConnectionString connectionString)
+        {            
+            _context = new SqlConnection(connectionString.Value); ;
         }
+        private ApiData<CalendarModel> dataList;
+        //public DataDal()
+        //{
+        //    var dbContext = new ConnectionFactory();
+        //    _context = dbContext.CreateConnection();
+        //}
         internal async Task<ApiData<CalendarModel>> Insert(CalendarModel calendarModel)
         {
             const string sqlStr = "INSERT INTO Calendar values(@CalendarDate,@ContentText,@InsertDate,@UpdateDate,@IP)\r\n";            
