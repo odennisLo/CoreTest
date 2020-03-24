@@ -7,6 +7,7 @@ using Core.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,7 +24,8 @@ namespace Core
 
         public IConfiguration Configuration { get; }
 
-        public void ConfigureContainer(ContainerBuilder builder) {
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
             builder.RegisterAssemblyTypes().AsImplementedInterfaces();
         }
 
@@ -31,8 +33,13 @@ namespace Core
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            var connectionString= new ConnectionString(Configuration.GetConnectionString("DefaultConnection"));
+            services.AddMvc(options =>
+            {
+                options.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
+            });
+            var connectionString = new ConnectionString(Configuration.GetConnectionString("DefaultConnection"));
             services.AddSingleton(connectionString);
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,7 +60,7 @@ namespace Core
             app.UseRouting();
             app.UseAuthorization();
             //LogManager.Configuration.Variables["ConnectionStrings"] = Configuration.GetConnectionString("DefaultConnection");
-      
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

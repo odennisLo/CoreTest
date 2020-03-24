@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Core.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,14 +11,14 @@ namespace Core.Connection
 {
     public class ConnectionFactory
     {
-        private readonly IConfiguration _configuration;        
+        public readonly ConnectionString _context;
         public IDbConnection CreateConnection(string name = "default")
         {
             switch (name)
             {
                 case "default":
                     {
-                        var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                        var connectionString = _context.Value;
                         return new SqlConnection(connectionString);
                     }
                 default:

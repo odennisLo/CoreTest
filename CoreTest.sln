@@ -5,7 +5,10 @@ VisualStudioVersion = 16.0.29911.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{7B20C7BA-0FAB-4794-B323-D373EA0462D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTestCRUD", "NUnitTestCRUD\NUnitTestCRUD.csproj", "{2BB5C267-9058-4976-8C45-C02BE1716225}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitTestCRUD", "NUnitTestCRUD\NUnitTestCRUD.csproj", "{2BB5C267-9058-4976-8C45-C02BE1716225}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7B20C7BA-0FAB-4794-B323-D373EA0462D8} = {7B20C7BA-0FAB-4794-B323-D373EA0462D8}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

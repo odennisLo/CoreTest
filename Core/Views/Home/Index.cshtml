@@ -1,7 +1,12 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-@section scripts {    
+@section scripts {
+    <link href=" https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/bootstrap-datepicker4/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+    <script src="~/bootstrap-datepicker4/moment.js"></script>
+    <script src="~/bootstrap-datepicker4/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="~/bootstrap-datepicker4/moment-2.10.6-locale-zh-tw.js"></script>
     <link href="~/packages/core/main.css" rel="stylesheet" />
     <link href="~/packages/daygrid/main.css" rel="stylesheet" />
     <link href="~/packages/timegrid/main.css" rel="stylesheet" />
@@ -12,99 +17,161 @@
     <script src="~/packages/timegrid/main.js"></script>
     <script src="~/packages/list/main.js"></script>
     <script>
-
-        document.addEventListener('DOMContentLoaded', function () {
+        $(function () {
+            $(".dateOnly").on("keypress keyup blur", function (event) {
+                event.preventDefault();
+            });
+            $("#StartDate").datetimepicker({
+                format: "YYYY/MM/DD hh:mm:ss",
+                locale: "zh-tw"
+            });
+            $("#EndDate").datetimepicker({
+                format: "YYYY/MM/DD hh:mm:ss",
+                locale: "zh-tw"
+            });
+            InvestigateCalendar();
+        })
+        function reset() {
+            calendar.destroy();
+            InvestigateCalendar();
+        }
+        function postData(url, data) {
+            return fetch(url,
+                {
+                    body: data,
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded'
+                    },
+                    method: 'POST',
+                    mode: 'same-origin',
+                    redirect: 'follow',
+                    referrer: 'no-referrer'
+                })
+                .then(response => response.json());
+        }
+        function SubmitForm() {
+            let err = '';
+            let StartDate = $('#StartDate').data('date');
+            if (StartDate === '' || StartDate === null) {
+                err += '請選擇開始日期!!\n';
+            }
+            let EndDate = $('#EndDate').data('date');
+            if (EndDate === '' || EndDate === null) {
+                err += '請選擇結束日期!!\n';
+            }
+            let CalendarTitle = $('#CalendatTitle').val();
+            if (CalendarTitle === '' || CalendarTitle === null) {
+                err += '請輸入標題!!\n';
+            }
+            let Content = $('#Content').val();
+            if (Content === '' || Content === null) {
+                err += '請輸入內容!!\n';
+            }
+            if (err !== '') {
+                alert(err);
+            } else {
+                postData('../Home/Insert', $("#CalendarForm").serialize()
+                ).then(function (res) {
+                    if (res.success) {
+                        alert("新增成功!");
+                        reset();
+                    } else {
+                        alert(`儲存失敗!! 錯誤訊息:${res.msg}`);
+                    }
+                }).catch(error => console.error(error));
+            }
+        }
+        function InvestigateCalendar() {
+            //document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
-
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid', 'timeGrid', 'list'],
-                //defaultView: 'month',
-                editable: true,
-                //selectable: true,
-                //header: { // 頂部排版
-                //    left: "prev,next prevYear,nextYear today", // 左邊放置上一頁、下一頁和今天
-                //    center: "title", // 中間放置標題
-                //    right: "month,basicWeek,basicDay" // 右邊放置月、周、天
-                //},
-                //dayNamesShort: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
-                //dayNamesMin: ["日", "一", "二", "三", "四", "五", "六"],
-                //monthNames: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
-                //buttonText: {
-                //    today: '今天',
-                //    month: '月',
-                //    week: '週',
-                //    day: '日',
-                //    prev: "上個月",
-                //    next: '下個月',
-                //    prevYear: '去年',
-                //    nextYear: '明年',
-                //},
                 header: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
                 },
-                defaultDate: Date.now,
+                buttonText: {
+                    today: "今天",
+                    dayGridMonth: "月",
+                    timeGridWeek: "周",
+                    timeGridDay: "天",
+                    listMonth: "清單",
+                },
+                locale: 'zh-tw',
+                defaultDate: '2020-02-12',
+                eventLimit: true,
                 navLinks: true, // can click day/week names to navigate views
                 businessHours: true, // display business hours
-                //editable: true,
-                events: [
-                    {
-                        title: 'Business Lunch',
-                        start: '2020-02-03T13:00:00',
-                        constraint: 'businessHours'
+                editable: true,
+                events: {                    
+                    url: '../Home/Date',
+                    method: 'POST',
+                    dataType: 'json',
+                    failure: function () {
+                        alert('there was an error while fetching events!');
                     },
-                    {
-                        title: 'Meeting',
-                        start: '2020-02-13T11:00:00',
-                        constraint: 'availableForMeeting', // defined below
-                        color: '#257e4a'
-                    },
-                    {
-                        title: 'Conference',
-                        start: '2020-02-18',
-                        end: '2020-02-20'
-                    },
-                    {
-                        title: 'Party',
-                        start: '2020-02-29T20:00:00'
-                    },
+                    //color: 'yellow',   // a non-ajax option
+                    //textColor: 'black' // a non-ajax option
+                }
+                //events: [
+                //    {
+                //        title: 'Business Lunch',
+                //        start: '2020-02-03T13:00:00',
+                //        constraint: 'businessHours'
+                //    },
+                //    {
+                //        title: 'Meeting',
+                //        start: '2020-02-13T11:00:00',
+                //        constraint: 'availableForMeeting', // defined below
+                //        color: '#257e4a'
+                //    },
+                //    {
+                //        title: 'Conference',
+                //        start: '2020-02-18',
+                //        end: '2020-02-20'
+                //    },
+                //    {
+                //        title: 'Party',
+                //        start: '2020-02-29T20:00:00'
+                //    },
 
-                    // areas where "Meeting" must be dropped
-                    {
-                        groupId: 'availableForMeeting',
-                        start: '2020-02-11T10:00:00',
-                        end: '2020-02-11T16:00:00',
-                        rendering: 'background'
-                    },
-                    {
-                        groupId: 'availableForMeeting',
-                        start: '2020-02-13T10:00:00',
-                        end: '2020-02-13T16:00:00',
-                        rendering: 'background'
-                    },
+                //    // areas where "Meeting" must be dropped
+                //    {
+                //        groupId: 'availableForMeeting',
+                //        start: '2020-02-11T10:00:00',
+                //        end: '2020-02-11T16:00:00',
+                //        rendering: 'background'
+                //    },
+                //    {
+                //        groupId: 'availableForMeeting',
+                //        start: '2020-02-13T10:00:00',
+                //        end: '2020-02-13T16:00:00',
+                //        rendering: 'background'
+                //    },
 
-                    // red areas where no events can be dropped
-                    {
-                        start: '2020-02-24',
-                        end: '2020-02-28',
-                        overlap: false,
-                        rendering: 'background',
-                        color: '#ff9f89'
-                    },
-                    {
-                        start: '2020-02-06',
-                        end: '2020-02-08',
-                        overlap: false,
-                        rendering: 'background',
-                        color: '#ff9f89'
-                    }
-                ]
+                //    // red areas where no events can be dropped
+                //    {
+                //        start: '2020-02-24',
+                //        end: '2020-02-28',
+                //        overlap: false,
+                //        rendering: 'background',
+                //        color: '#ff9f89'
+                //    },
+                //    {
+                //        start: '2020-02-06',
+                //        end: '2020-02-08',
+                //        overlap: false,
+                //        rendering: 'background',
+                //        color: '#ff9f89'
+                //    }
+                //]
             });
-
             calendar.render();
-        });
-
+            //});
+        }
     </script>
     <style>
 
@@ -121,7 +188,65 @@
         }
     </style>
 }
-<div class="text-center">
-    <input type="button" value="新增" class="btn btn-success"/>
-    <div id='calendar'></div>
-</div>
+<form id="CalendarForm">
+    <div>
+        <div class="text-center">
+            <input type="button" value="新增" class="btn btn-success" data-toggle="modal" data-target="#CalendarModal" />
+        </div>
+        <div class="modal fade" id="CalendarModal" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" style="height: 100%">
+            <div class="modal-dialog" style="height: 100%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ModalLabel">新增清單</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="CalendatTitle"><span class="text-danger">*</span>新增標題</label>
+                                    <input class="form-control" id="CalendatTitle" name="Title">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="StartDate"><span class="text-danger">*</span>開始時間</label>
+                                    <div class="input-group date" id="StartDate" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input dateOnly" data-target="#StartDate" name="StartDate" />
+                                        <div class="input-group-append" data-target="#StartDate" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="EndDate"><span class="text-danger">*</span>結束時間</label>
+                                    <div class="input-group date" id="EndDate" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input dateOnly" data-target="#EndDate" name="EndDate" />
+                                        <div class="input-group-append" data-target="#EndDate" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="Content"><span class="text-danger">*</span>內容</label>
+                                    <input class="form-control" id="Content" name="Content">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="margin-top: 60px;">
+                        <input type="button" class="btn btn-success" data-dismiss="modal" onclick="SubmitForm()" value="新增" />
+                        <input type="button" class="btn btn-secondary" data-dismiss="modal" value="關閉" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id='calendar'></div>
+    </div>
+</form>
