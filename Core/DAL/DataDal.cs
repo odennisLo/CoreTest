@@ -26,7 +26,7 @@ namespace Core.DAL
         //}
         internal async Task<ApiData<CalendarModel>> Insert(CalendarModel calendarModel)
         {
-            const string sqlStr = "INSERT INTO Calendar VALUES(@Title,@StartDate,@EndDate,@Content,@InsertDate,@UpdateDate,@IP) \r\n";            
+            const string sqlStr = "INSERT INTO Calendar VALUES(@Title,@StartDate,@EndDate,@Content,@InsertDate,@UpdateDate,@IP) \r\n";
             try
             {
                 using (var conn = new SqlConnection(_context.Value))
@@ -34,7 +34,7 @@ namespace Core.DAL
                     await conn.QueryAsync<CalendarModel>(sqlStr, calendarModel).ConfigureAwait(false);
                 }
                 dataList = new ApiData<CalendarModel>
-                {                  
+                {
                     Success = true
                 };
             }
@@ -45,41 +45,20 @@ namespace Core.DAL
                     Msg = ex.Message
                 };
             }
-            return dataList;            
+            return dataList;
         }
-        //internal async Task<ApiData<CalendarModel>> Update(CalendarModel calendarModel)
-        //{
-        //    const string sqlStr = "Update Calendar set ContentText=@ContentText,UpdateDate=@UpdateDate,IP=@IP) Where SerId=@SerID\r\n";
-        //    try
-        //    {
-        //        await _context.QueryAsync<CalendarModel>(sqlStr, calendarModel).ConfigureAwait(false);
-        //        dataList = new ApiData<CalendarModel>
-        //        {                    
-        //            Success = true
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        dataList = new ApiData<CalendarModel>
-        //        {
-        //            Msg = ex.Message
-        //        };
-        //    }
-        //    return dataList;
-        //}
-        internal async Task<ApiData<CalendarModel>> GerCalendarList()
+        internal async Task<ApiData<CalendarModel>> Update(CalendarModel calendarmodel)
         {
-            const string sqlStr = "Select * From Calendar\r\n";
+            const string sqlStr = "update calendar set StartDate=@StartDate,UpdateDate=@UpdateDate,IP=@IP) where SerID=@SerID\r\n";
             try
             {
-                using (var conn = new SqlConnection(_context.Value))
+                using var conn = new SqlConnection(_context.Value);
+                await conn.QueryAsync<CalendarModel>(sqlStr, calendarmodel).ConfigureAwait(false);
+                dataList = new ApiData<CalendarModel>
                 {
-                    dataList = new ApiData<CalendarModel>
-                    {
-                        Data = await conn.QueryAsync<CalendarModel>(sqlStr).ConfigureAwait(false),
-                        Success = true
-                    };
-                }
+                    Data = await conn.QueryAsync<CalendarModel>(sqlStr).ConfigureAwait(false),
+                    Success = true
+                };
             }
             catch (Exception ex)
             {
@@ -90,26 +69,48 @@ namespace Core.DAL
             }
             return dataList;
         }
-        //internal async Task<ApiData<CalendarModel>> Delete(long SerId)
-        //{
-        //    const string sqlStr = "Delete * From CalendarModel Where SerId=@SerId\r\n";
-        //    try
-        //    {
-        //        await _context.QueryAsync<CalendarModel>(sqlStr, SerId).ConfigureAwait(false);
-        //        dataList = new ApiData<CalendarModel>
-        //        {                   
-        //            Success = true
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        dataList = new ApiData<CalendarModel>
-        //        {
-        //            Msg = ex.Message
-        //        };
-        //    }
-        //    return dataList;
-        //}
+        internal async Task<ApiData<CalendarModel>> GerCalendarList()
+        {
+            const string sqlStr = "Select * From Calendar\r\n";
+            try
+            {
+                using var conn = new SqlConnection(_context.Value);
+                dataList = new ApiData<CalendarModel>
+                {
+                    Data = await conn.QueryAsync<CalendarModel>(sqlStr).ConfigureAwait(false),
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                dataList = new ApiData<CalendarModel>
+                {
+                    Msg = ex.Message
+                };
+            }
+            return dataList;
+        }
+        internal async Task<ApiData<CalendarModel>> Delete(long SerId)
+        {
+            const string sqlStr = "Delete From CalendarModel Where SerId=@SerId\r\n";
+            try
+            {
+                using var conn = new SqlConnection(_context.Value);
+                await conn.QueryAsync<CalendarModel>(sqlStr, SerId).ConfigureAwait(false);
+                dataList = new ApiData<CalendarModel>
+                {
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                dataList = new ApiData<CalendarModel>
+                {
+                    Msg = ex.Message
+                };
+            }
+            return dataList;
+        }
 
     }
 }

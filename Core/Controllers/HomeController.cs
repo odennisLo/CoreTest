@@ -38,7 +38,7 @@ namespace Core.Controllers
             var data =await dal.Insert(calendarModel);
             return Ok(data);
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Date()
         {                        
             var dal = new DataDal(_context);
@@ -56,6 +56,20 @@ namespace Core.Controllers
                        };
             var rows = List.ToArray();
             return Ok(rows);
+        }
+        [HttpPatch]
+        public async Task<IActionResult> Edit(CalendarModel calendarModel)
+        {
+            var dal = new DataDal(_context);
+            var data = await dal.Update(calendarModel);
+            return Ok(data);
+        }
+        [HttpDelete]
+        public async Task<IActionResult> Delete(long id)
+        {
+            var dal = new DataDal(_context);
+            var data = await dal.Delete(id);
+            return Ok(data);
         }
 
         public IActionResult Privacy()
