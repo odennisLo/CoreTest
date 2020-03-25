@@ -1,14 +1,10 @@
 ﻿using Core.DAL;
 using Core.Models;
-using Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Core.BLL
 {
-    public class DateService// : IDataServices
+    public class DateService
     {
         private readonly DataRepository _dataRepo;
 

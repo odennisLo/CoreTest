@@ -1,30 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Core.Models;
-using Core.DAL;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Core.BLL;
-using Core.Services;
 
 namespace Core.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IActionContextAccessor _accessor;
-        private readonly ConnectionString _context;
         private readonly DateService _dataService;
-        public HomeController(ILogger<HomeController> logger, IActionContextAccessor accessor, ConnectionString connectionString, DateService dataServices)
+        public HomeController(IActionContextAccessor accessor, DateService dataServices)
         {
-            _logger = logger;
             _accessor = accessor;
-            _context = connectionString;
-            this._dataService = dataServices;
+            _dataService = dataServices;
         }
 
         public IActionResult Index()
@@ -43,10 +35,7 @@ namespace Core.Controllers
         [HttpGet]
         public async Task<IActionResult> Date()
         {
-            var dal = new DataRepository(_context);
-
             var getCalendar = await _dataService.GerCalendarList();
-
             var List = from t in getCalendar.Data
                        select new
                        {
@@ -71,11 +60,6 @@ namespace Core.Controllers
         {
             var data = await _dataService.Delete(id);
             return Ok(data);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

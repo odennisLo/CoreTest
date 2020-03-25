@@ -1,8 +1,6 @@
-﻿using Core.Connection;
-using Core.Models;
+﻿using Core.Models;
 using Dapper;
 using System;
-using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -46,9 +44,9 @@ namespace Core.DAL
             try
             {
                 using var conn = new SqlConnection(_context.Value);
-                await conn.QueryAsync<CalendarModel>(sqlStr, new { StartDate =calendarmodel.StartDate, SerID =calendarmodel.SerID,IP=calendarmodel.IP}).ConfigureAwait(false);
+                await conn.QueryAsync<CalendarModel>(sqlStr, new { StartDate = calendarmodel.StartDate, SerID = calendarmodel.SerID, IP = calendarmodel.IP }).ConfigureAwait(false);
                 dataList = new ApiData<CalendarModel>
-                {                    
+                {
                     Success = true
                 };
             }
@@ -90,7 +88,7 @@ namespace Core.DAL
                 using var conn = new SqlConnection(_context.Value);
                 await conn.QueryAsync(sqlStr, new
                 {
-                    SerId=SerId
+                    SerId = SerId
                 }).ConfigureAwait(false);
                 dataList = new ApiData<CalendarModel>
                 {
