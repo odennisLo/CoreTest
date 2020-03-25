@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Core.Models;
@@ -26,7 +27,13 @@ namespace Core
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterAssemblyTypes().AsImplementedInterfaces();
+            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
+           .Where(t => t.Name.EndsWith("Service"))
+           .AsSelf();            
+            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
+            .Where(t => t.Name.EndsWith("Repository"))
+            .AsSelf();
+            //builder.RegisterAssemblyTypes().AsImplementedInterfaces();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

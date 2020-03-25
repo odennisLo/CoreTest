@@ -48,7 +48,7 @@
             calendar.destroy();
             InvestigateCalendar();
         }
-        function postData(url, data,type) {
+        function postData(url, data, type) {
             return fetch(url,
                 {
                     body: data,
@@ -85,7 +85,7 @@
             if (err !== '') {
                 alert(err);
             } else {
-                postData('../Home/Insert', $("#CalendarForm").serialize(),'POST'
+                postData('../Home/Insert', $("#CalendarForm").serialize(), 'POST'
                 ).then(function (res) {
                     if (res.success) {
                         alert("新增成功!");
@@ -97,8 +97,7 @@
             }
         }
         function InvestigateCalendar() {
-            var date = new Date();
-            //document.addEventListener('DOMContentLoaded', function () {
+            var date = new Date();            
             var calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid', 'timeGrid', 'list'],
@@ -117,10 +116,11 @@
                 locale: 'zh-tw',
                 defaultDate: date.yyyymmdd(),
                 eventLimit: true,
-                navLinks: true, // can click day/week names to navigate views
-                businessHours: true, // display business hours
+                navLinks: true,
+                businessHours: true, 
                 editable: true,
-                events: {                    
+                displayEventTime:true,
+                events: {
                     url: '../Home/Date',
                     method: 'Get',
                     dataType: 'json',
@@ -129,27 +129,24 @@
                     }
                 },
                 eventDrop: function (info) {
-                    alert(info.event.title + " was dropped on " + info.event.start + info.event.id);
-
                     if (!confirm("確定改變時間嗎?")) {
                         info.revert();
                     } else {
-                        postData('../Home/Edit', "SerID=" + info.event.id + "&StartDate=" + info.event.start.toISOString(),'Patch'
+                        postData('../Home/Edit', "SerID=" + info.event.id + "&StartDate=" + info.event.start.toISOString() , 'Patch'
                         ).then(function (res) {
                             if (res.success) {
-                                alert("修改成功!");                                
+                                alert("修改成功!");
                             } else {
                                 alert(`修改失敗!! 錯誤訊息:${res.msg}`);
                             }
-                        }).catch(error => console.error(error));                        
+                        }).catch(error => console.error(error));
                     }
                 },
                 eventClick: function (info) {
-                    alert(info.event.id)
                     if (!confirm("確定要刪除嗎?")) {
                         info.revert();
                     } else {
-                        postData('../Home/Delete', "id=" + info.event.id,'Delete'
+                        postData('../Home/Delete', "id=" + info.event.id, 'Delete'
                         ).then(function (res) {
                             if (res.success) {
                                 alert("刪除成功!");
@@ -157,64 +154,11 @@
                             } else {
                                 alert(`刪除失敗!! 錯誤訊息:${res.msg}`);
                             }
-                        }).catch(error => console.error(error));                        
-                    }                    
+                        }).catch(error => console.error(error));
+                    }
                 }
-                //events: [
-                //    {
-                //        title: 'Business Lunch',
-                //        start: '2020-02-03T13:00:00',
-                //        constraint: 'businessHours'
-                //    },
-                //    {
-                //        title: 'Meeting',
-                //        start: '2020-02-13T11:00:00',
-                //        constraint: 'availableForMeeting', // defined below
-                //        color: '#257e4a'
-                //    },
-                //    {
-                //        title: 'Conference',
-                //        start: '2020-02-18',
-                //        end: '2020-02-20'
-                //    },
-                //    {
-                //        title: 'Party',
-                //        start: '2020-02-29T20:00:00'
-                //    },
-
-                //    // areas where "Meeting" must be dropped
-                //    {
-                //        groupId: 'availableForMeeting',
-                //        start: '2020-02-11T10:00:00',
-                //        end: '2020-02-11T16:00:00',
-                //        rendering: 'background'
-                //    },
-                //    {
-                //        groupId: 'availableForMeeting',
-                //        start: '2020-02-13T10:00:00',
-                //        end: '2020-02-13T16:00:00',
-                //        rendering: 'background'
-                //    },
-
-                //    // red areas where no events can be dropped
-                //    {
-                //        start: '2020-02-24',
-                //        end: '2020-02-28',
-                //        overlap: false,
-                //        rendering: 'background',
-                //        color: '#ff9f89'
-                //    },
-                //    {
-                //        start: '2020-02-06',
-                //        end: '2020-02-08',
-                //        overlap: false,
-                //        rendering: 'background',
-                //        color: '#ff9f89'
-                //    }
-                //]
             });
             calendar.render();
-            //});
         }
     </script>
     <style>
@@ -250,7 +194,7 @@
                         <div class="container">
                             <div class="form-row">
                                 <div class="form-group col-md-12">
-                                    <label for="CalendatTitle"><span class="text-danger">*</span>新增標題</label>
+                                    <label for="CalendatTitle"><span class="text-danger">*</span>新增行程</label>
                                     <input class="form-control" id="CalendatTitle" name="Title">
                                 </div>
                             </div>
@@ -274,12 +218,6 @@
                                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-12">
-                                    <label for="Content"><span class="text-danger">*</span>內容</label>
-                                    <input class="form-control" id="Content" name="Content">
                                 </div>
                             </div>
                         </div>

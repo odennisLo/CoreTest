@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Core.Models;
 using Core.DAL;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Core.BLL;
+using Core.Services;
 
 namespace Core.Controllers
 {
@@ -16,12 +18,13 @@ namespace Core.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IActionContextAccessor _accessor;
         private readonly ConnectionString _context;
-
-        public HomeController(ILogger<HomeController> logger,IActionContextAccessor accessor, ConnectionString connectionString)
+        private readonly DateService _dataService;
+        public HomeController(ILogger<HomeController> logger, IActionContextAccessor accessor, ConnectionString connectionString, DateService dataServices)
         {
             _logger = logger;
             _accessor = accessor;
             _context = connectionString;
+            this._dataService = dataServices;
         }
 
         public IActionResult Index()
@@ -30,29 +33,28 @@ namespace Core.Controllers
         }
         [HttpPost]
         public async Task<IActionResult> Insert(CalendarModel calendarModel)
-        {            
-            calendarModel.IP= _accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
+        {
+            calendarModel.IP = _accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
             calendarModel.InsertDate = DateTime.Now;
             calendarModel.UpdateDate = DateTime.Now;
-            var dal = new DataDal(_context);
-            var data =await dal.Insert(calendarModel);
+            var data = await _dataService.Insert(calendarModel).ConfigureAwait(false);
             return Ok(data);
         }
         [HttpGet]
         public async Task<IActionResult> Date()
-        {                        
-            var dal = new DataDal(_context);
+        {
+            var dal = new DataRepository(_context);
 
-            var getCalendar =await dal.GerCalendarList();
+            var getCalendar = await _dataService.GerCalendarList();
 
             var List = from t in getCalendar.Data
                        select new
                        {
                            id = t.SerID,
                            start = t.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                           end=t.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                           end = t.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
                            title = t.Title,
-                           color = "lightBlue",                          
+                           color = "lightBlue",
                        };
             var rows = List.ToArray();
             return Ok(rows);
@@ -60,15 +62,14 @@ namespace Core.Controllers
         [HttpPatch]
         public async Task<IActionResult> Edit(CalendarModel calendarModel)
         {
-            var dal = new DataDal(_context);
-            var data = await dal.Update(calendarModel);
+            calendarModel.IP = _accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
+            var data = await _dataService.Update(calendarModel);
             return Ok(data);
         }
         [HttpDelete]
         public async Task<IActionResult> Delete(long id)
         {
-            var dal = new DataDal(_context);
-            var data = await dal.Delete(id);
+            var data = await _dataService.Delete(id);
             return Ok(data);
         }
 
